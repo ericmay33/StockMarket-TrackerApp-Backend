@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "firstName": "Eric",
+        "lastName": "May",
+        "hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+        "balance": 1500,
+        "portfolio": [
+            {
+                "stockName": "Google",
+                "stockTicker": "GOOGL",
+                "amount": 2,
+                "averagePrice": 150
+            }
+        ]
+
+    }
+]
