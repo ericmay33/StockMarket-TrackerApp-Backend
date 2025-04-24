@@ -6,7 +6,7 @@ import { createHash } from 'crypto';
 import * as users from './users.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
-import { getLoginRequestValidator, formatAjvValidationErrors } from './schema.js';
+import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator } from './schema.js';
 
 dotenv.config()
 
@@ -107,7 +107,7 @@ async function initializeServer() {
 		}  
 	});
 
-	interface accountRequestBody {
+	interface loginRequestBody {
 		username: string,
 		password: string
 	}
@@ -119,7 +119,7 @@ async function initializeServer() {
 			if (!validator(req.body)) {
 				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
 			}
-			const body = req.body as accountRequestBody;
+			const body = req.body as loginRequestBody;
 			const username = body.username;
 			const passwordHash = createHash('sha256').update(body.password).digest('hex');
 
@@ -136,11 +136,33 @@ async function initializeServer() {
 		}
 	});
 
+	interface registerRequestBody {
+		firstName: string,
+		lastName: string,
+		username: string,
+		password: string
+	}
 
 	console.log('Defining endpoint POST /register');
 	app.post('/register', async (req, res): Promise<any> => { 	// Create new user: DO TODAY
 		try {
+			const validator = getRegisterRequestValidator();
+			if (!validator(req.body)) {
+				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
+			}
+			const body = req.body as registerRequestBody;
+			const username = body.username;
 			
+			const doesUserExist = await users.doesUserExist(username) as boolean;
+			if (doesUserExist) {
+				return res.status(403).json({ error: "User with that username already exists." })
+			}
+
+			const passwordHash = createHash('sha256').update(body.password).digest('hex');
+			const newUser = await users.createUser(body.firstName, body.lastName, username, passwordHash) as users.User;
+			
+
+
 		} catch (err: unknown) {
 			logError(err)
 			return res.status(500).json({ error: 'Unable to complete login due to internal server error' })

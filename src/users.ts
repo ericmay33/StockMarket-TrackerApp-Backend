@@ -1,5 +1,7 @@
 import { readJsonFile, writeJsonFile } from './utils.js'
 
+const usersFilePath = './data-store/users.json';
+
 export interface PortfolioStock {
     stockName: string;
     stockTicker: string;
@@ -18,7 +20,7 @@ export interface User {
 }
 
 export async function getUserById(id: number): Promise<User | null> {
-    const users = await readJsonFile('./data/users.json') as User[];
+    const users = await readJsonFile(usersFilePath) as User[];
     const user = users.find(user => user.id === id);
 
     if (!user) {
@@ -29,7 +31,7 @@ export async function getUserById(id: number): Promise<User | null> {
 }
 
 export async function getUserByCredentials(username: string, passwordHash: string): Promise<User | null> {
-    const users = await readJsonFile('./data/users.json') as User[];
+    const users = await readJsonFile(usersFilePath) as User[];
     const user = users.find(user => user.username === username && user.passwordHash === passwordHash);
 
     if (!user) {
@@ -37,4 +39,47 @@ export async function getUserByCredentials(username: string, passwordHash: strin
     } else {
         return user;
     }
+}
+
+export async function doesUserExist(username: string): Promise<boolean> {
+    const users = await readJsonFile(usersFilePath) as User[];
+    const user = users.find(user => user.username === username);
+
+    if (user) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export async function createUser(firstName: string, lastName: string, username: string, passwordHash: string): Promise<User> {
+    const users = await readJsonFile<User[]>(usersFilePath);
+    const id = findLowestAvailableId(users) as number;
+
+    const newUser = {
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        passwordHash: passwordHash,
+        balance: 10000,
+        portfolio: []
+    } as User;
+
+    users.push(newUser);
+    await writeJsonFile(usersFilePath, JSON.stringify(users, null, 2));
+
+    return newUser;
+}
+
+
+function findLowestAvailableId(users: User[]): number {
+    const sortedIds = users.map(u => u.id).sort((a, b) => a - b);
+    let expectedId = 1;
+
+    for (const id of sortedIds) {
+        if (id > expectedId) break;
+        if (id === expectedId) expectedId++;
+    }
+    return expectedId;
 }

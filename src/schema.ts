@@ -24,6 +24,33 @@ export function getLoginRequestValidator() {
   return createValidator(schema)
 }
 
+export function getRegisterRequestValidator() {
+    const schema = {
+      type: 'object',
+      properties: {
+        firstName: {
+            type: 'string',
+            minLength: 1
+        },
+        lastName: {
+            type: 'string',
+            minLength: 1
+        },
+        username: {
+          type: 'string',
+          minLength: 1
+        },
+        password: {
+          type: 'string',
+          minLength: 1
+        }
+      },
+      required: ['firstName', 'lastName', 'username', 'password'],
+      additionalProperties: false
+    }
+    return createValidator(schema)
+}
+
 type AjvValidatorError = ErrorObject<string, Record<string, any>, unknown>[] | null | undefined
 
 export function formatAjvValidationErrors(errors: AjvValidatorError) {
