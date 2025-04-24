@@ -114,22 +114,37 @@ async function initializeServer() {
 	
 	console.log('Defining endpoint POST /login');
 	app.post('/login', async (req, res): Promise<any> => {		// Login as existing user: DO TODAY
-		const validator = getLoginRequestValidator();
-		if (!validator(req.body)) {
-			return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
-      	}
-		const body = req.body as accountRequestBody;
-		const username = body.username;
-		const passwordHash = createHash('sha256').update(body.password).digest('hex');
+		try {
+			const validator = getLoginRequestValidator();
+			if (!validator(req.body)) {
+				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
+			}
+			const body = req.body as accountRequestBody;
+			const username = body.username;
+			const passwordHash = createHash('sha256').update(body.password).digest('hex');
 
-		
+			const user = await users.getUserByCredentials(username, passwordHash);
+			if (!user) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
 
+			const authToken = createAuthToken({ id: user.id } as TokenPayload);
+			return res.status(201).json({ token: authToken });
+		} catch (err: unknown) {
+			logError(err)
+			return res.status(500).json({ error: 'Unable to complete login due to internal server error' })
+		}
 	});
 
 
 	console.log('Defining endpoint POST /register');
 	app.post('/register', async (req, res): Promise<any> => { 	// Create new user: DO TODAY
-
+		try {
+			
+		} catch (err: unknown) {
+			logError(err)
+			return res.status(500).json({ error: 'Unable to complete login due to internal server error' })
+		}
 	});
 
 
