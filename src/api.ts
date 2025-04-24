@@ -6,6 +6,7 @@ import { createHash } from 'crypto';
 import * as users from './users.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
+import { getLoginRequestValidator, formatAjvValidationErrors } from './schema.js';
 
 dotenv.config()
 
@@ -92,6 +93,7 @@ async function initializeServer() {
 				id: user.id, 
 				firstName: user.firstName, 
 				lastName: user.lastName,
+				username: user.username,
 				balance: user.balance
 			}
 			return res.status(200).json(userResponse);
@@ -105,10 +107,23 @@ async function initializeServer() {
 		}  
 	});
 
-
+	interface accountRequestBody {
+		username: string,
+		password: string
+	}
+	
 	console.log('Defining endpoint POST /login');
 	app.post('/login', async (req, res): Promise<any> => {		// Login as existing user: DO TODAY
+		const validator = getLoginRequestValidator();
+		if (!validator(req.body)) {
+			return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
+      	}
+		const body = req.body as accountRequestBody;
+		const username = body.username;
+		const passwordHash = createHash('sha256').update(body.password).digest('hex');
+
 		
+
 	});
 
 
