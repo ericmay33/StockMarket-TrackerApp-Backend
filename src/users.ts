@@ -72,7 +72,6 @@ export async function createUser(firstName: string, lastName: string, username: 
     return newUser;
 }
 
-
 function findLowestAvailableId(users: User[]): number {
     const sortedIds = users.map(u => u.id).sort((a, b) => a - b);
     let expectedId = 1;
@@ -82,4 +81,11 @@ function findLowestAvailableId(users: User[]): number {
         if (id === expectedId) expectedId++;
     }
     return expectedId;
+}
+
+export async function deleteUserById(id: number): Promise<void> {
+    const users = await readJsonFile(usersFilePath) as User[];
+    const updatedUsers = users.filter(user => user.id !== id) as User[];
+
+    await writeJsonFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
 }

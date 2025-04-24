@@ -7,6 +7,7 @@ import * as users from './users.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
 import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator } from './schema.js';
+import { Token } from 'typescript';
 
 dotenv.config()
 
@@ -40,8 +41,9 @@ async function initializeServer() {
 		id: number
 	}
 
+	// Get user portfolio information
 	console.log('Defining endpoint GET /portfolio');
-	app.get('/portfolio', async (req, res): Promise<any> => {		// Get user portfolio information
+	app.get('/portfolio', async (req, res): Promise<any> => {
 		try {
 			if (!req.headers.token) {
 				return res.status(401).json({ error: 'Unauthorized' })
@@ -68,15 +70,16 @@ async function initializeServer() {
 		}  
 	});
 
-
+	// Get all stock data
 	console.log('Defining endpoint GET /stocks');
-	app.get('/stocks', async (req, res): Promise<any> => {		// Get all stock data
+	app.get('/stocks', async (req, res): Promise<any> => {
 		
 	});
 
 
+	// Get user data
 	console.log('Defining endpoint GET /user');
-	app.get('/user', async (req, res): Promise<any> => { 		// Get user data
+	app.get('/user', async (req, res): Promise<any> => { 
 		try {
 			if (!req.headers.token) {
 				return res.status(401).json({ error: 'Unauthorized' })
@@ -112,8 +115,9 @@ async function initializeServer() {
 		password: string
 	}
 	
+	// Login as existing user
 	console.log('Defining endpoint POST /login');
-	app.post('/login', async (req, res): Promise<any> => {		// Login as existing user: DO TODAY
+	app.post('/login', async (req, res): Promise<any> => {
 		try {
 			const validator = getLoginRequestValidator();
 			if (!validator(req.body)) {
@@ -143,8 +147,9 @@ async function initializeServer() {
 		password: string
 	}
 
+	// Create a new user
 	console.log('Defining endpoint POST /register');
-	app.post('/register', async (req, res): Promise<any> => { 	// Create new user: DO TODAY
+	app.post('/register', async (req, res): Promise<any> => {
 		try {
 			const validator = getRegisterRequestValidator();
 			if (!validator(req.body)) {
@@ -160,24 +165,56 @@ async function initializeServer() {
 
 			const passwordHash = createHash('sha256').update(body.password).digest('hex');
 			const newUser = await users.createUser(body.firstName, body.lastName, username, passwordHash) as users.User;
-			
 
+			const authToken = createAuthToken<TokenPayload>({ id: newUser.id }) as string;
+			return res.status(201).json({ token: authToken});
 
 		} catch (err: unknown) {
 			logError(err)
-			return res.status(500).json({ error: 'Unable to complete login due to internal server error' })
+			return res.status(500).json({ error: 'Unable to complete registration due to internal server error' })
 		}
 	});
 
 
+	// Delete existing user
+	console.log('Defining endpoint DELETE /delete')
+	app.delete('/delete', async (req, res): Promise<any> => {
+		try {
+			if (!req.headers.token) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+
+			const token = req.headers.token as string;
+			const payload = validateAuthToken<TokenPayload>(token);
+			const user = await users.getUserById(payload.id);
+
+			if (!user) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+			
+			await users.deleteUserById(user.id);
+			return res.status(200).json({ message: 'User deleted successfully' });
+
+		} catch(err: unknown) {
+			if (err instanceof InvalidAuthTokenError) {
+			  return res.status(401).json({ error: 'Unauthorized' })
+			}
+			logError(err)
+			return res.status(500).json({ error: 'Unable to get user info due to internal server error' })
+		} 
+	});
+
+
+	// Buy stock as user
 	console.log('Defining endpoint POST /buy');
-	app.post('/buy', async (req, res): Promise<any> => {		// Buy stock as user
+	app.post('/buy', async (req, res): Promise<any> => {	
 
 	});
 
 
+	// Sell stock as user
 	console.log('Defining endpoint POST /sell');
-	app.post('/sell', async (req, res): Promise<any> => {		// Sell stock as user
+	app.post('/sell', async (req, res): Promise<any> => {
 
 	});
 
