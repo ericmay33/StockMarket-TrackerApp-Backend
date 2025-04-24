@@ -66,7 +66,7 @@ async function initializeServer() {
 			  return res.status(401).json({ error: 'Unauthorized' })
 			}
 			logError(err)
-			return res.status(500).json({ error: 'Unable to get user info due to interal server error' })
+			return res.status(500).json({ error: 'Unable to get user info due to internal server error' })
 		}  
 	});
 
@@ -120,14 +120,19 @@ async function initializeServer() {
 	app.post('/login', async (req, res): Promise<any> => {
 		try {
 			const validator = getLoginRequestValidator();
+			console.log('Validator loaded:', validator);
 			if (!validator(req.body)) {
 				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
 			}
 			const body = req.body as loginRequestBody;
 			const username = body.username;
+
+			console.log('Password received:', body.password);
 			const passwordHash = createHash('sha256').update(body.password).digest('hex');
 
 			const user = await users.getUserByCredentials(username, passwordHash);
+			console.log('User found:', user);
+
 			if (!user) {
 				return res.status(401).json({ error: 'Unauthorized' });
 			}
@@ -135,7 +140,7 @@ async function initializeServer() {
 			const authToken = createAuthToken({ id: user.id } as TokenPayload);
 			return res.status(201).json({ token: authToken });
 		} catch (err: unknown) {
-			logError(err)
+			//logError(err)
 			return res.status(500).json({ error: 'Unable to complete login due to internal server error' })
 		}
 	});

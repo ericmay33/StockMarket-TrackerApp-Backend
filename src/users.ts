@@ -1,6 +1,6 @@
 import { readJsonFile, writeJsonFile } from './utils.js'
 
-const usersFilePath = './data-store/users.json';
+const usersFilePath = './data/users.json';
 
 export interface PortfolioStock {
     stockName: string;

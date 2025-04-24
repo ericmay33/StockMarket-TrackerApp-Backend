@@ -6,7 +6,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "npx tsx watch src/index.ts"
+    "start": "npx tsx watch src/api.ts"
   },
   "type": "module",
   "repository": {
