@@ -70,7 +70,7 @@ async function initializeServer() {
 		}  
 	});
 
-	// Get all stock data
+	// Get all stock data: THURSDAY
 	console.log('Defining endpoint GET /stocks');
 	app.get('/stocks', async (req, res): Promise<any> => {
 		
@@ -210,14 +210,14 @@ async function initializeServer() {
 	});
 
 
-	// Buy stock as user
+	// Buy stock as user: THURSDAY
 	console.log('Defining endpoint POST /buy');
 	app.post('/buy', async (req, res): Promise<any> => {	
 
 	});
 
 
-	// Sell stock as user
+	// Sell stock as user: THURSDAY
 	console.log('Defining endpoint POST /sell');
 	app.post('/sell', async (req, res): Promise<any> => {
 
