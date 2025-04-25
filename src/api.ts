@@ -55,10 +55,25 @@ async function initializeServer() {
 				return res.status(401).json({ error: 'Unauthorized' })
 			}
 
-			const userResponse = {
-				portfolio: user.portfolio as users.PortfolioStock[]
+			const portfolio = user.portfolio;
+
+			if (!portfolio || portfolio.length === 0) {
+				return res.status(200).json([]);
 			}
-			return res.status(200).json(userResponse);
+
+			const portfolioTickers = portfolio.map(stock => stock.stockTicker) as string[];
+			const portfolioStocks = await Stocks.getStocksByTickers(portfolioTickers) as Stocks.Stock[];
+
+			const userResponse = portfolioStocks.map(stock => {
+				const userStock = portfolio.find(p => p.stockTicker === stock.ticker);
+				return {
+					...stock,
+					amount: userStock?.amount ?? 0,
+					averagePrice: userStock?.averagePrice ?? 0
+				};
+			});
+	
+			return res.status(200).json(userResponse)
 
 		} catch(err: unknown) {
 			if (err instanceof InvalidAuthTokenError) {
@@ -69,7 +84,7 @@ async function initializeServer() {
 		}  
 	});
 
-	// Get all stock data: THURSDAY
+	// Get all stock data
 	console.log('Defining endpoint GET /stocks');
 	app.get('/stocks', async (req, res): Promise<any> => {
 		try {
@@ -80,9 +95,6 @@ async function initializeServer() {
 			return res.status(500).json({ error: 'Unable to get stocks info due to internal server error' })
 		} 
 	});
-
-	
-
 
 	// Get user data
 	console.log('Defining endpoint GET /user');
@@ -127,18 +139,15 @@ async function initializeServer() {
 	app.post('/login', async (req, res): Promise<any> => {
 		try {
 			const validator = getLoginRequestValidator();
-			console.log('Validator loaded:', validator);
 			if (!validator(req.body)) {
 				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) })
 			}
 			const body = req.body as loginRequestBody;
 			const username = body.username;
 
-			console.log('Password received:', body.password);
 			const passwordHash = createHash('sha256').update(body.password).digest('hex');
 
 			const user = await users.getUserByCredentials(username, passwordHash);
-			console.log('User found:', user);
 
 			if (!user) {
 				return res.status(401).json({ error: 'Unauthorized' });

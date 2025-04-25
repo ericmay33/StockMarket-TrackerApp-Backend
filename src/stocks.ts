@@ -23,3 +23,14 @@ export async function getAllStocks(): Promise<Stock[] | null> {
         return stocks;
     }
 }
+
+export async function getStocksByTickers(tickers: string[]): Promise<Stock[] | null> {
+    const allStocks = await getAllStocks() as Stock[];
+    const stocks = allStocks.filter(stock => tickers.includes(stock.ticker));
+
+    if (!stocks) {
+        return null;
+    } else {
+        return stocks;
+    }
+}
