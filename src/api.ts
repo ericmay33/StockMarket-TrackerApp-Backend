@@ -1,13 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { createHash } from 'crypto';
 import * as users from './users.js'
+import * as Stocks from './stocks.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
 import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator } from './schema.js';
-import { Token } from 'typescript';
 
 dotenv.config()
 
@@ -73,8 +72,16 @@ async function initializeServer() {
 	// Get all stock data: THURSDAY
 	console.log('Defining endpoint GET /stocks');
 	app.get('/stocks', async (req, res): Promise<any> => {
-		
+		try {
+			const stocks = await Stocks.getAllStocks() as Stocks.Stock[];
+			return res.status(200).json(stocks);
+		} catch(err: unknown) {
+			logError(err)
+			return res.status(500).json({ error: 'Unable to get stocks info due to internal server error' })
+		} 
 	});
+
+	
 
 
 	// Get user data
