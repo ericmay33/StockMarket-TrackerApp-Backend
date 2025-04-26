@@ -57,8 +57,7 @@ export function getTransactionRequestValidator() {
     properties: {
       ticker: {
           type: 'string',
-          minLength: 1,
-          transform: ["trim", "toUpperCase"],
+          minLength: 1
       },
       amount: {
           type: 'number',

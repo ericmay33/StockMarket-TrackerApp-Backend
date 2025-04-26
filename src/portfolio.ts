@@ -45,7 +45,7 @@ export async function handleBuy(user: User, ticker: string, amount: number): Pro
         }
     });
 
-    await writeJsonFile(usersFilePath, JSON.stringify(users, null, 2));
+    await writeJsonFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
     return user;
 }
 

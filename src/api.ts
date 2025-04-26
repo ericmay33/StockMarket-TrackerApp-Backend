@@ -256,7 +256,7 @@ async function initializeServer() {
 			user = await handleBuy(user, body.ticker, body.amount) as users.User;
 
 			if (!user) {
-				return res.status(400).json({ error: 'Unable to complete the purchase' });
+				return res.status(409).json({ error: 'Unable to complete the purchase' });
 			}
 			return res.status(200).json({ message: 'Purchase successful', user });
 
