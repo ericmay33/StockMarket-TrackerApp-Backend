@@ -20,7 +20,7 @@ export async function handleBuy(user: User, ticker: string, amount: number): Pro
 
     user.balance = parseFloat((user.balance - purchaseCost).toFixed(2));
     const portfolio = user.portfolio as PortfolioStock[];
-    const existingStock = portfolio.find(s => s.stockTicker === ticker);
+    const existingStock = portfolio.find(s => s.ticker === ticker);
 
     if (existingStock) {
         const totalShares = existingStock.amount + amount;
@@ -29,8 +29,15 @@ export async function handleBuy(user: User, ticker: string, amount: number): Pro
         existingStock.averagePrice = parseFloat((totalCost / totalShares).toFixed(2));
     } else {
         portfolio.push({
-            stockName: stock.name,
-            stockTicker: ticker,
+            ticker: stock.ticker,
+            name: stock.name,
+            marketCap: stock.marketCap,
+            percentChange: stock.percentChange,
+            price: stock.price,
+            sector: stock.sector,
+            industry: stock.industry,
+            description: stock.description,
+            image: stock.image,
             amount: amount,
             averagePrice: stock.price
         });
@@ -57,7 +64,7 @@ export async function handleSell(user: User, ticker: string, amount: number): Pr
     }
 
     const portfolio = user.portfolio as PortfolioStock[];
-    const existingStock = portfolio.find(s => s.stockTicker === ticker);
+    const existingStock = portfolio.find(s => s.ticker === ticker);
 
     if (!existingStock) {
         return null;
@@ -73,7 +80,7 @@ export async function handleSell(user: User, ticker: string, amount: number): Pr
 
     // If user now has 0 shares
     if (existingStock.amount === 0) {
-        const index = portfolio.findIndex(s => s.stockTicker === ticker);
+        const index = portfolio.findIndex(s => s.ticker === ticker);
         if (index !== -1) {
             portfolio.splice(index, 1);
         }

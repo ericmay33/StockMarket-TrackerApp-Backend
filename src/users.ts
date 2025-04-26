@@ -3,8 +3,15 @@ import { readJsonFile, writeJsonFile } from './utils.js'
 const usersFilePath = './data/users.json';
 
 export interface PortfolioStock {
-    stockName: string;
-    stockTicker: string;
+    ticker: string;
+    name: string;
+    marketCap: number;
+    percentChange: number;
+    price: number;
+    sector: string;
+    industry: string;
+    description: string;
+    image: string;
     amount: number;
     averagePrice: number;
 }

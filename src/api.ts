@@ -62,11 +62,11 @@ async function initializeServer() {
 				return res.status(200).json([]);
 			}
 
-			const portfolioTickers = portfolio.map(stock => stock.stockTicker) as string[];
+			const portfolioTickers = portfolio.map(stock => stock.ticker) as string[];
 			const portfolioStocks = await Stocks.getStocksByTickers(portfolioTickers) as Stocks.Stock[];
 
 			const userResponse = portfolioStocks.map(stock => {
-				const userStock = portfolio.find(p => p.stockTicker === stock.ticker);
+				const userStock = portfolio.find(p => p.ticker === stock.ticker);
 				return {
 					...stock,
 					amount: userStock?.amount ?? 0,
@@ -232,7 +232,7 @@ async function initializeServer() {
 		amount: number
 	}
 
-	// Buy stock as user: THURSDAY
+	// Buy stock as user
 	console.log('Defining endpoint POST /buy');
 	app.post('/buy', async (req, res): Promise<any> => {	
 		try {
@@ -269,7 +269,7 @@ async function initializeServer() {
 		} 
 	});
 
-	// Sell stock as user: THURSDAY
+	// Sell stock as user
 	console.log('Defining endpoint POST /sell');
 	app.post('/sell', async (req, res): Promise<any> => {
 		try {
