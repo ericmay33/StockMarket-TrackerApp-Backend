@@ -105,7 +105,8 @@ const tickers = [
     "TRV" // The Travelers Companies
 ] as string[];
 
-const API_KEY = 'otD0RkKoZWWHnodMvderV7MHbqCcZmA4';
+// REMOVED KEY
+const API_KEY = '';
 
 interface Stock {
     ticker: string;

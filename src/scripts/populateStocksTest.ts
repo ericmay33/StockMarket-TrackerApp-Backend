@@ -2,7 +2,8 @@ import axios from 'axios';
 import { writeJsonFile } from '../utils';
 import Timeout from 'await-timeout';
 
-const API_KEY = 'otD0RkKoZWWHnodMvderV7MHbqCcZmA4';
+// REMOVED KEY
+const API_KEY = '';
 const TICKER = "TRV";
 
 interface Stock {
