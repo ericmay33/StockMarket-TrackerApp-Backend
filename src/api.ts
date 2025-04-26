@@ -6,7 +6,7 @@ import * as users from './users.js'
 import * as Stocks from './stocks.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
-import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator, getTransactionRequestValidator } from './schema.js';
+import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator, getTransactionRequestValidator, getStockRequstValidator } from './schema.js';
 import { handleBuy, handleSell } from './portfolio.js';
 
 dotenv.config()
@@ -24,9 +24,7 @@ async function initializeServer() {
 	app.use(express.json());
 
 	console.log('Configuring CORS...')
-	app.use(cors({
-		origin: ['http://127.0.0.1:5000', 'http://localhost:5000']
-	}))
+	app.use(cors());
 
 	function logError(err: unknown) {
 		if (err instanceof Error) {
@@ -95,6 +93,28 @@ async function initializeServer() {
 			logError(err)
 			return res.status(500).json({ error: 'Unable to get stocks info due to internal server error' })
 		} 
+	});
+
+	interface StockRequestBody {
+		ticker: string
+	}
+
+	// Get stock data for one ticker
+	console.log('Defining endpoint POST /stocks');
+	app.post('/stocks/:ticker', async (req, res): Promise<any> => {
+		try {
+			const ticker = req.params.ticker;
+			const stock = await Stocks.getStockByTicker(ticker);
+	
+			if (!stock) {
+				return res.status(404).json({ error: 'Stock does not exist.' });
+			}
+	
+			return res.status(200).json(stock);
+		} catch (err) {
+			logError(err);
+			return res.status(500).json({ error: 'Unable to get stock info due to internal server error' });
+		}
 	});
 
 	// Get user data
@@ -199,8 +219,8 @@ async function initializeServer() {
 
 
 	// Delete existing user
-	console.log('Defining endpoint DELETE /delete')
-	app.delete('/delete', async (req, res): Promise<any> => {
+	console.log('Defining endpoint DELETE /user')
+	app.delete('/user', async (req, res): Promise<any> => {
 		try {
 			if (!req.headers.token) {
 				return res.status(401).json({ error: 'Unauthorized' });

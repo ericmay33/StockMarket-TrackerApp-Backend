@@ -70,6 +70,21 @@ export function getTransactionRequestValidator() {
   return createValidator(schema)
 }
 
+export function getStockRequstValidator() {
+  const schema = {
+    type: 'object',
+    properties: {
+      ticker: {
+          type: 'string',
+          minLength: 1
+      }
+    },
+    required: ['ticker'],
+    additionalProperties: false
+  }
+  return createValidator(schema)
+}
+
 type AjvValidatorError = ErrorObject<string, Record<string, any>, unknown>[] | null | undefined
 
 export function formatAjvValidationErrors(errors: AjvValidatorError) {
