@@ -269,13 +269,42 @@ async function initializeServer() {
 		} 
 	});
 
-
 	// Sell stock as user: THURSDAY
 	console.log('Defining endpoint POST /sell');
 	app.post('/sell', async (req, res): Promise<any> => {
+		try {
+			if (!req.headers.token) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+			const validator = getTransactionRequestValidator(); 
+			if (!validator(req.body)) {
+				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) });
+			}
 
+			const token = req.headers.token as string;
+			const payload = validateAuthToken<TokenPayload>(token);
+			let user = await users.getUserById(payload.id);
+
+			if (!user) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+
+			const body = req.body as TransactionRequestBody;
+			user = await handleSell(user, body.ticker, body.amount) as users.User;
+
+			if (!user) {
+				return res.status(409).json({ error: 'Unable to complete the sale' });
+			}
+			return res.status(200).json({ message: 'Sale successful', user });
+
+		} catch(err: unknown) {
+			if (err instanceof InvalidAuthTokenError) {
+				return res.status(401).json({ error: 'Unauthorized' })
+			}
+			logError(err)
+			return res.status(500).json({ error: 'Unable to get user info due to internal server error' })
+		} 
 	});
-
 
 	// Start express server
     app.listen(port, () => {
