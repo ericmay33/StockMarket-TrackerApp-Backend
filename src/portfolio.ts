@@ -63,12 +63,12 @@ export async function handleSell(user: User, ticker: string, amount: number): Pr
         return null;
     }
 
-    if (!(existingStock.amount < amount)) {
+    if (existingStock.amount < amount) {
         return null;
     }
 
     const saleValue = parseFloat((stock.price*amount).toFixed(2));
-    user.balance = user.balance + parseFloat((user.balance + saleValue).toFixed(2));
+    user.balance = parseFloat((user.balance + saleValue).toFixed(2));
     existingStock.amount -= amount;
 
     // If user now has 0 shares
@@ -88,6 +88,6 @@ export async function handleSell(user: User, ticker: string, amount: number): Pr
         }
     });
 
-    await writeJsonFile(usersFilePath, JSON.stringify(users, null, 2));
+    await writeJsonFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
     return user;
 }

@@ -5,7 +5,7 @@
     "lastName": "May",
     "username": "Eric",
     "passwordHash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
-    "balance": 247.59,
+    "balance": 1500,
     "portfolio": [
       {
         "stockName": "Google",
@@ -16,8 +16,8 @@
       {
         "stockName": "Apple Inc",
         "stockTicker": "AAPL",
-        "amount": 11,
-        "averagePrice": 204.77
+        "amount": 5,
+        "averagePrice": 200
       }
     ]
   }

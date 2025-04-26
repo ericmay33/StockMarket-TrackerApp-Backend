@@ -10,9 +10,15 @@ async function main() {
     const tokenResponse = await axios.post(`${BASE_URL}/login`, requestBody);
     const token = tokenResponse.data.token;
 
-    const requestBody2 = {
+    // OPTIONS FOR TESTING
+    /*const requestBody2 = {
         ticker: 'AAPL',
         amount: 2
+    }*/
+
+    const requestBody2 = {
+        ticker: 'LLY',
+        amount: 1
     }
 
     const sellResponse = await axios.post(`${BASE_URL}/sell`, requestBody2, { headers: { token }});
