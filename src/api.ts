@@ -6,7 +6,8 @@ import * as users from './users.js'
 import * as Stocks from './stocks.js'
 import { createAuthToken, validateAuthToken } from './auth.js'
 import { InvalidAuthTokenError } from './errors.js'
-import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator } from './schema.js';
+import { getLoginRequestValidator, formatAjvValidationErrors, getRegisterRequestValidator, getTransactionRequestValidator } from './schema.js';
+import { handleBuy, handleSell } from './portfolio.js';
 
 dotenv.config()
 
@@ -225,11 +226,47 @@ async function initializeServer() {
 		} 
 	});
 
+	
+	interface TransactionRequestBody {
+		ticker: string,
+		amount: number
+	}
 
 	// Buy stock as user: THURSDAY
 	console.log('Defining endpoint POST /buy');
 	app.post('/buy', async (req, res): Promise<any> => {	
+		try {
+			if (!req.headers.token) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+			const validator = getTransactionRequestValidator(); 
+			if (!validator(req.body)) {
+				return res.status(400).json({ error: 'malformed/invalid request body', message: formatAjvValidationErrors(validator.errors) });
+			}
 
+			const token = req.headers.token as string;
+			const payload = validateAuthToken<TokenPayload>(token);
+			let user = await users.getUserById(payload.id);
+
+			if (!user) {
+				return res.status(401).json({ error: 'Unauthorized' });
+			}
+
+			const body = req.body as TransactionRequestBody;
+			user = await handleBuy(user, body.ticker, body.amount) as users.User;
+
+			if (!user) {
+				return res.status(400).json({ error: 'Unable to complete the purchase' });
+			}
+			return res.status(200).json({ message: 'Purchase successful', user });
+
+		} catch(err: unknown) {
+			if (err instanceof InvalidAuthTokenError) {
+				return res.status(401).json({ error: 'Unauthorized' })
+			}
+			logError(err)
+			return res.status(500).json({ error: 'Unable to get user info due to internal server error' })
+		} 
 	});
 
 

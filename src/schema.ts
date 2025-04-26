@@ -51,6 +51,26 @@ export function getRegisterRequestValidator() {
     return createValidator(schema)
 }
 
+export function getTransactionRequestValidator() {
+  const schema = {
+    type: 'object',
+    properties: {
+      ticker: {
+          type: 'string',
+          minLength: 1,
+          transform: ["trim", "toUpperCase"],
+      },
+      amount: {
+          type: 'number',
+          minimum: 1
+      }
+    },
+    required: ['ticker', 'amount'],
+    additionalProperties: false
+  }
+  return createValidator(schema)
+}
+
 type AjvValidatorError = ErrorObject<string, Record<string, any>, unknown>[] | null | undefined
 
 export function formatAjvValidationErrors(errors: AjvValidatorError) {

@@ -12,6 +12,12 @@
         "stockTicker": "GOOGL",
         "amount": 2,
         "averagePrice": 150
+      }, 
+      {
+        "stockName": "Apple Inc",
+        "stockTicker": "AAPL",
+        "amount": 5,
+        "averagePrice": 200
       }
     ]
   }

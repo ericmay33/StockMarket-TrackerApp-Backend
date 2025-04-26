@@ -34,3 +34,14 @@ export async function getStocksByTickers(tickers: string[]): Promise<Stock[] | n
         return stocks;
     }
 }
+
+export async function getStockByTicker(ticker: string): Promise<Stock | null> {
+    const allStocks = await getAllStocks() as Stock[];
+    const stock = allStocks.find(stock => ticker === stock.ticker);
+
+    if (!stock) {
+        return null;
+    } else {
+        return stock;
+    }
+}
