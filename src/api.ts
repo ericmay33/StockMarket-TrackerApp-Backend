@@ -101,9 +101,9 @@ async function initializeServer() {
 
 	// Get stock data for one ticker
 	console.log('Defining endpoint POST /stocks');
-	app.post('/stocks/:ticker', async (req, res): Promise<any> => {
+	app.get('/stocks/:ticker', async (req, res): Promise<any> => {
 		try {
-			const ticker = req.params.ticker;
+			const ticker = req.params.ticker as string;
 			const stock = await Stocks.getStockByTicker(ticker);
 	
 			if (!stock) {
@@ -216,36 +216,6 @@ async function initializeServer() {
 			return res.status(500).json({ error: 'Unable to complete registration due to internal server error' })
 		}
 	});
-
-
-	// Delete existing user
-	console.log('Defining endpoint DELETE /user')
-	app.delete('/user', async (req, res): Promise<any> => {
-		try {
-			if (!req.headers.token) {
-				return res.status(401).json({ error: 'Unauthorized' });
-			}
-
-			const token = req.headers.token as string;
-			const payload = validateAuthToken<TokenPayload>(token);
-			const user = await users.getUserById(payload.id);
-
-			if (!user) {
-				return res.status(401).json({ error: 'Unauthorized' });
-			}
-			
-			await users.deleteUserById(user.id);
-			return res.status(200).json({ message: 'User deleted successfully' });
-
-		} catch(err: unknown) {
-			if (err instanceof InvalidAuthTokenError) {
-			  return res.status(401).json({ error: 'Unauthorized' })
-			}
-			logError(err)
-			return res.status(500).json({ error: 'Unable to get user info due to internal server error' })
-		} 
-	});
-
 	
 	interface TransactionRequestBody {
 		ticker: string,
