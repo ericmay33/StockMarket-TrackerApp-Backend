@@ -1,7 +1,9 @@
 import { readJsonFile, writeJsonFile } from './utils.js'
 import axios from 'axios';
+import dotenv from 'dotenv';
 
 const stocksFilePath = './data/stocks.json';
+dotenv.config();
 
 export interface Stock {
     ticker: string;
@@ -47,8 +49,7 @@ export async function getStockByTicker(ticker: string): Promise<Stock | null> {
     }
 }
 
-const API_KEY = process.env.API_KEY_1;
-// CAN CHANGE API_KEY1 to API_KEY2 or API_KEY3 for more requests
+const API_KEY = process.env.API_KEY1;
 
 const tickers = [
     "AAPL", // Apple
@@ -176,7 +177,7 @@ async function fetchStockData(ticker: string): Promise<Stock | null> {
             image: data.image
         };
     } catch (err) {
-        console.error(`Error fetching ${ticker}:`, (err as Error).message);
+        console.error(`Error fetching ${ticker}:`, err);
         return null;
     }
 }

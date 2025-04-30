@@ -22,7 +22,7 @@ async function initializeServer() {
 	console.log('Initializing Express Server...')
 
 	console.log('Fetching updated stock data')
-	await Stocks.fetchStocksOnce();
+	//await Stocks.fetchStocksOnce();
 
 	app.use(express.json());
 
