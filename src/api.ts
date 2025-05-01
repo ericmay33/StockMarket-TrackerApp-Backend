@@ -22,6 +22,7 @@ async function initializeServer() {
 	console.log('Initializing Express Server...')
 
 	console.log('Fetching updated stock data')
+	// COMMENT OUT THIS LINE BELOW TO STOP STOCK UPDATES, ONLY TWO STOCK UPDATES PER DAY DUE TO APIKEY LIMITS
 	//await Stocks.fetchStocksOnce();
 
 	app.use(express.json());
